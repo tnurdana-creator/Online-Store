@@ -1,116 +1,78 @@
---1-тапсырма:SELECT
-SELECT * FROM products;
+-- 1-тапсырма. SELECT
+SELECT * FROM tauar;
 
---2-тапсырма: WHERE
+-- 2-тапсырма. WHERE
 SELECT *
-FROM products
-WHERE price > 100000;
+FROM tauar
+WHERE bagasy > 100000;
 
-
--- 3-тапсырма: Бірнеше шарт
+-- 3-тапсырма. Бірнеше шарт: AND
 SELECT *
-FROM products
-WHERE price > 10000 AND price < 300000;
+FROM tauar
+WHERE bagasy > 100000 AND bagasy < 500000;
 
---OR
-
--- 3-тапсырма: OR
+-- Бірнеше шарт: OR
 SELECT *
-FROM products
-WHERE price < 10000 OR price > 300000;
+FROM tauar
+WHERE atauy = 'Telefon' OR atauy = 'Noutbuk';
 
+-- 4-тапсырма. DISTINCT
+SELECT DISTINCT atauy
+FROM tauar;
 
--- 4-тапсырма: DISTINCT
-SELECT DISTINCT status
-FROM orders;
-
-
--- 5-тапсырма: ORDER BY
+-- 5-тапсырма. ORDER BY
 SELECT *
-FROM products
-ORDER BY price ASC;
+FROM tauar
+ORDER BY bagasy ASC;
 
-
--- Бағасы бойынша кему ретімен
 SELECT *
-FROM products
-ORDER BY price DESC;
+FROM tauar
+ORDER BY bagasy DESC;
 
+-- 6-тапсырма. GROUP BY
+SELECT bagasy, COUNT(*)
+FROM tauar
+GROUP BY bagasy;
 
--- 6-тапсырма: GROUP BY
+-- 7-тапсырма. Агрегаттық функциялар
 SELECT
-    client_id,
-    COUNT(*) AS order_count
-FROM orders
-GROUP BY client_id
-ORDER BY client_id;
+    COUNT(*),
+    SUM(bagasy),
+    AVG(bagasy),
+    MIN(bagasy),
+    MAX(bagasy)
+FROM tauar;
+
+-- 8-тапсырма. HAVING
+SELECT bagasy, COUNT(*)
+FROM tauar
+GROUP BY bagasy
+HAVING COUNT(*) > 0;
 
 
--- 7-тапсырма: Агрегаттық функциялар
-SELECT
-    COUNT(*) AS product_count,
-    SUM(price) AS total_price,
-    AVG(price) AS average_price,
-    MIN(price) AS min_price,
-    MAX(price) AS max_price
-FROM products;
+-- ПРАКТИКАЛЫҚ АНАЛИТИКАЛЫҚ СҰРАНЫСТАР
 
+-- 1. Әр санаттағы тауарлар санын анықтау
+SELECT sanat, COUNT(*)
+FROM tauar
+GROUP BY sanat;
 
--- 8-тапсырма: HAVING
-SELECT
-    client_id,
-    COUNT(*) AS order_count
-FROM orders
-GROUP BY client_id
-HAVING COUNT(*) >= 1
-ORDER BY client_id;
+-- 2. Орташа бағадан қымбат тауарларды анықтау
+SELECT *
+FROM tauar
+WHERE bagasy > (SELECT AVG(bagasy) FROM tauar);
 
+-- 3. Ең көп тапсырыс жасаған пайдаланушыларды анықтау
+SELECT klient_id, COUNT(*)
+FROM tapsyrys
+GROUP BY klient_id
+ORDER BY COUNT(*) DESC;
 
--- Аналитикалық сұраныс 1
--- Орташа бағадан қымбат тауарлар
-SELECT name, price
-FROM products
-WHERE price > (
-    SELECT AVG(price)
-    FROM products
-)
-ORDER BY price DESC;
+-- 4. Белгілі бір кезеңдегі тапсырыстар санын анықтау
+SELECT COUNT(*)
+FROM tapsyrys
+WHERE kuni BETWEEN '2026-10-01' AND '2026-10-31';
 
-
--- Аналитикалық сұраныс 2
-SELECT client_id, COUNT(*) AS order_count
-FROM orders
-GROUP BY client_id
-ORDER BY order_count DESC;
-
-
--- Аналитикалық сұраныс 3
-SELECT client_id, SUM(total_amount) AS total_amount
-FROM orders
-GROUP BY client_id
-ORDER BY total_amount DESC;
-
-
--- Аналитикалық сұраныс 4
-SELECT product_id, SUM(quantity) AS total_quantity
-FROM warehouse_stock
-GROUP BY product_id
-ORDER BY total_quantity DESC;
-
-
--- Аналитикалық сұраныс 5
-SELECT
-    status,
-    COUNT(*) AS order_count,
-    SUM(total_amount) AS total_amount
-FROM orders
-GROUP BY status
-HAVING COUNT(*) >= 1
-ORDER BY order_count DESC;
-
-
-
-
-
-
-
+-- 5. Тапсырыстардың жалпы сомасын анықтау
+SELECT SUM(zhalpy_soma)
+FROM tapsyrys;
