@@ -1,86 +1,92 @@
-CREATE TABLE order_items (
-    order_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL CHECK (quantity > 0),
-    price NUMERIC(12,2) NOT NULL CHECK (price >= 0),
-    PRIMARY KEY (order_id, product_id),
-    FOREIGN KEY (order_id) REFERENCES orders(id),
-    FOREIGN KEY (product_id) REFERENCES products(id)
-);
-
-CREATE TABLE payments (
+CREATE TABLE klient (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    order_id INTEGER NOT NULL,
-    amount NUMERIC(12,2) NOT NULL CHECK (amount > 0),
-    status VARCHAR(50) NOT NULL DEFAULT 'pending',
-    FOREIGN KEY (order_id) REFERENCES orders(id)
+    aty VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    telefon VARCHAR(20)
 );
 
-CREATE TABLE error_checks (
+CREATE TABLE tauar (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    order_id INTEGER NOT NULL,
-    error_type VARCHAR(100),
-    warning_text TEXT,
-    client_confirmed BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (order_id) REFERENCES orders(id)
+    atauy VARCHAR(150) NOT NULL,
+    bagasy NUMERIC(10,2) NOT NULL CHECK (bagasy >= 0)
 );
 
-CREATE TABLE consolidation_points (
+CREATE TABLE tapsyrys (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    address VARCHAR(255) NOT NULL
+    martebesi VARCHAR(50) NOT NULL,
+    zhalpy_soma NUMERIC(12,2) NOT NULL CHECK (zhalpy_soma >= 0),
+    klient_id INTEGER NOT NULL,
+    FOREIGN KEY (klient_id) REFERENCES klient(id)
 );
 
-CREATE TABLE delivery_plans (
+CREATE TABLE tolem (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    order_id INTEGER NOT NULL UNIQUE,
-    status VARCHAR(50) NOT NULL DEFAULT 'planned',
-    consolidation_point_id INTEGER,
-    FOREIGN KEY (order_id) REFERENCES orders(id),
-    FOREIGN KEY (consolidation_point_id)
-        REFERENCES consolidation_points(id)
+    soma NUMERIC(12,2) NOT NULL CHECK (soma >= 0),
+    martebesi VARCHAR(50) NOT NULL,
+    tapsyrys_id INTEGER NOT NULL,
+    FOREIGN KEY (tapsyrys_id) REFERENCES tapsyrys(id)
 );
 
-CREATE TABLE warehouses (
+CREATE TABLE zhetkizu (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    address VARCHAR(255) NOT NULL
+    martebesi VARCHAR(50) NOT NULL,
+    tapsyrys_id INTEGER NOT NULL,
+    FOREIGN KEY (tapsyrys_id) REFERENCES tapsyrys(id)
 );
 
-CREATE TABLE warehouse_stock (
-    warehouse_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL CHECK (quantity >= 0),
-    PRIMARY KEY (warehouse_id, product_id),
-    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id),
-    FOREIGN KEY (product_id) REFERENCES products(id)
-);
-
-CREATE TABLE delivery_plan_warehouses (
-    plan_id INTEGER NOT NULL,
-    warehouse_id INTEGER NOT NULL,
-    PRIMARY KEY (plan_id, warehouse_id),
-    FOREIGN KEY (plan_id) REFERENCES delivery_plans(id),
-    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id)
-);
-
-CREATE TABLE couriers (
+CREATE TABLE kuryer (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    phone VARCHAR(20)
+    aty VARCHAR(100) NOT NULL,
+    telefon VARCHAR(20)
 );
 
-CREATE TABLE deliveries (
-    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    order_id INTEGER NOT NULL,
-    courier_id INTEGER NOT NULL,
-    consolidation_point_id INTEGER,
-    status VARCHAR(50) NOT NULL DEFAULT 'pending',
-    FOREIGN KEY (order_id) REFERENCES orders(id),
-    FOREIGN KEY (courier_id) REFERENCES couriers(id),
-    FOREIGN KEY (consolidation_point_id)
-        REFERENCES consolidation_points(id)
+CREATE TABLE zhinaktau_nuktesi (
+    id INT PRIMARY KEY,
+    mekenzhai VARCHAR(100)
 );
 
+CREATE TABLE qoima (
+    id INT PRIMARY KEY,
+    mekenzhai VARCHAR(100)
+);
 
+CREATE TABLE qoima_qory (
+    id INT PRIMARY KEY,
+    qoima_id INT REFERENCES qoima(id),
+    tauar_id INT REFERENCES tauar(id),
+    sany INT
+);
 
+CREATE TABLE sebet (
+    id INT PRIMARY KEY,
+    klient_id INT REFERENCES klient(id)
+);
 
+CREATE TABLE sebet_pozitsiyasy (
+    id INT PRIMARY KEY,
+    sebet_id INT REFERENCES sebet(id),
+    tauar_id INT REFERENCES tauar(id),
+    sany INT
+);
 
+CREATE TABLE tapsyrys_pozitsiyasy (
+    id INT PRIMARY KEY,
+    tapsyrys_id INT REFERENCES tapsyrys(id),
+    tauar_id INT REFERENCES tauar(id),
+    sany INT,
+    bagasy NUMERIC(10,2)
+);
+
+CREATE TABLE error_check (
+    id INT PRIMARY KEY,
+    qate_turi VARCHAR(100),
+    eskertu_matini VARCHAR(200),
+    klient_rastady BOOLEAN,
+    tapsyrys_id INT REFERENCES tapsyrys(id)
+);
+
+CREATE TABLE delivery_plan (
+    id INT PRIMARY KEY,
+    martebesi VARCHAR(50),
+    tapsyrys_id INT REFERENCES tapsyrys(id)
+);
