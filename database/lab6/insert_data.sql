@@ -143,7 +143,4 @@ SELECT * FROM tauar;
 -- Kuryerdi oshiru
 DELETE FROM kuryer
 WHERE id = 3;
-
 SELECT * FROM kuryer;
-
-
